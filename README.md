@@ -38,7 +38,7 @@ How to start using this script:
 
 1. Fetch some random deb-package
 
-       cd ~/deb-download
+       cd deb-download
        chmod +x deb-download.sh
        ./deb-download.sh ubuntu bionic fslint
 
