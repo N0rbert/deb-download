@@ -42,9 +42,9 @@ How to start using this script:
        chmod +x deb-download.sh
        ./deb-download.sh ubuntu bionic fslint
 
-1. Carefully inspect the contents of `./storage` folder, then try to install main deb-package to the target system, then fix its dependencies one-by-one. For better understanding consult with <https://packages.ubuntu.com>.
+1. Carefully inspect the contents of `storage` folder, then try to install main deb-package to the target system, then fix its dependencies one-by-one. For better understanding consult with <https://packages.ubuntu.com>.
 
-   Please also note that this `./storage` folder will be cleared on next run of the script!
+   Please also note that this `storage` folder will be cleared on next run of the script!
 
 **Warning:** author of this script can't provide any warranty about successful installation of downloaded deb-packages on the target system. Be careful!
 
