@@ -20,10 +20,13 @@ rolling_debian_releases="sid|unstable|experimental";
 eol_debian_releases="squeeze|wheezy";
 debian_release_is_eol=0;
 
+supported_mint_releases="18$|19$|19.1|19.2|19.3|20$|20.1";
+eol_mint_releases="17$";
+
 no_install_suggests="--no-install-suggests";
 
-if [ "$distro" != "debian" -a "$distro" != "ubuntu" ]; then
-    echo "Error: only Debian and Ubuntu are supported!";
+if [ "$distro" != "debian" -a "$distro" != "ubuntu" -a "$distro" != "mint" ]; then
+    echo "Error: only Debian, Ubuntu and Mint are supported!";
     exit 1;
 else
     if [ "$distro" == "ubuntu" ]; then
@@ -59,6 +62,19 @@ else
            fi
        fi
     fi
+
+    if [ "$distro" == "mint" ]; then
+       if ! echo $release | grep -wEq "$supported_mint_releases|$eol_mint_releases"
+       then
+            echo "Error: Mint $release is not supported!";
+            exit 1;
+       else
+           if echo $release | grep -wEq "$eol_mint_releases"
+           then
+                echo "Warning: Mint $release is EOL, but script will continue run.";
+           fi
+       fi
+    fi
 fi
 
 # prepare storage folder
@@ -67,8 +83,13 @@ mkdir storage
 cd storage
 
 # prepare Dockerfile
-cat << EOF > Dockerfile
-FROM $distro:$release
+if [ "$distro" == "ubuntu" -o "$distro" == "debian" ]; then
+    echo "FROM $distro:$release" > Dockerfile
+else
+    echo "FROM linuxmintd/mint$release-amd64" > Dockerfile
+fi
+
+cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'Acquire::http::Proxy "$http_proxy";' > /etc/apt/apt.conf.d/99proxy
 EOF
 
@@ -82,7 +103,9 @@ if [ "$distro" == "ubuntu" ]; then
         echo "RUN echo 'deb http://archive.ubuntu.com/ubuntu $release-updates main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
         echo "RUN echo 'deb http://archive.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
     fi
-else
+fi
+
+if [ "$distro" == "debian" ]; then
     if [ $debian_release_is_eol == 1 ]; then
         echo "RUN echo 'deb http://archive.debian.org/debian $release main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
     else # adding *contrib* and *non-free*
@@ -112,7 +135,7 @@ apt-get install -y --no-install-recommends $no_install_suggests --reinstall --do
 EOF
 
 # build container
-docker build . -t "dd-$release"
+docker build . -t "dd-$distro-$release"
 
 # run script inside container
-docker run -v ${PWD}:/var/cache/apt/archives -it "dd-$release" sh /var/cache/apt/archives/script.sh
+docker run -v ${PWD}:/var/cache/apt/archives -it "dd-$distro-$release" sh /var/cache/apt/archives/script.sh
