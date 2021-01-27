@@ -12,8 +12,8 @@ The `deb-download.sh` takes at least three arguments, as shown in example below:
 ./deb-download.sh ubuntu bionic zenmap
 ```
 
-* 1st is distribution - `debian` for Debian or `ubuntu` for Ubuntu;
-* 2nd is version - all versions starting from Debian 6 (`squeeze`) and Ubuntu 12.04 LTS (`precise`) are supported;
+* 1st is distribution - `debian` for Debian, `ubuntu` for Ubuntu or `mint` for LinuxMint;
+* 2nd is version - all versions starting from Debian 6 (`squeeze`), Ubuntu 12.04 LTS (`precise`) and LinuxMint (`17`) are supported by script;
 * 3rd and greater - represent package(s) name(s) - in the above example it is single `zenmap` package.
 
 Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./deb-download.sh ubuntu bionic zenmap` .
@@ -47,4 +47,3 @@ How to start using this script:
    Please also note that this `storage` folder will be cleared on next run of the script!
 
 **Warning:** author of this script can't provide any warranty about successful installation of downloaded deb-packages on the target system. Be careful!
-
