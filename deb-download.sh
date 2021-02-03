@@ -10,7 +10,7 @@ distro="$1";
 release="$2";
 packages=${@:3};
 
-supported_ubuntu_releases="precise|trusty|bionic|focal|groovy|hirsute|devel";
+supported_ubuntu_releases="precise|trusty|xenial|bionic|focal|groovy|hirsute|devel";
 eol_ubuntu_releases="quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan";
 ubuntu_release_is_eol=0;
 
