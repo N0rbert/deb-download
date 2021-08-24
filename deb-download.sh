@@ -138,4 +138,4 @@ EOF
 docker build . -t "dd-$distro-$release"
 
 # run script inside container
-docker run -v ${PWD}:/var/cache/apt/archives -it "dd-$distro-$release" sh /var/cache/apt/archives/script.sh
+docker run --rm -v ${PWD}:/var/cache/apt/archives -it "dd-$distro-$release" sh /var/cache/apt/archives/script.sh
