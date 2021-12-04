@@ -10,18 +10,19 @@ distro="$1";
 release="$2";
 packages=${@:3};
 
-supported_ubuntu_releases="trusty|xenial|bionic|focal|groovy|hirsute|impish|devel";
+supported_ubuntu_releases="trusty|xenial|bionic|focal|groovy|hirsute|impish|jammy|devel";
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan";
 ubuntu_release_is_eol=0;
 
-supported_debian_releases="jessie|oldoldstable|stretch|oldstable|buster|stable";
-testing_debian_releases="bullseye|testing";
+supported_debian_releases="jessie|oldoldstable|stretch|oldstable|buster|stable|bullseye";
+debian_releases_newsecurity="stable|bullseye";
+testing_debian_releases="bookworm|testing";
 rolling_debian_releases="sid|unstable|experimental";
 eol_debian_releases="squeeze|wheezy";
 debian_release_is_eol=0;
 
-supported_mint_releases="18$|19$|19.1|19.2|19.3|20$|20.1";
-eol_mint_releases="17$";
+supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3";
+eol_mint_releases="17$|18$";
 
 no_install_suggests="--no-install-suggests";
 
@@ -37,7 +38,7 @@ else
        else
            if echo $release | grep -wEq "$eol_ubuntu_releases"
            then
-                echo "Warning: Ubuntu $release is EOL, but script will continue run.";
+                echo "Warning: Ubuntu $release is EOL, but script will continue to run.";
                 ubuntu_release_is_eol=1;
            fi
        fi
@@ -118,9 +119,15 @@ if [ "$distro" == "debian" ]; then
         fi
 
         # not adding debian-security
-        if ! echo $release | grep -wEq "$testing_debian_releases|$rolling_debian_releases"
+        if ! echo $release | grep -wEq "$testing_debian_releases|$rolling_debian_releases|$debian_releases_newsecurity"
         then
             echo "RUN echo 'deb http://security.debian.org/debian-security/ $release/updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+        fi
+        
+        # adding security in new fashion
+        if echo $release | grep -wEq "$debian_releases_newsecurity"
+        then
+            echo "RUN echo 'deb http://security.debian.org/debian-security/ $release-security main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
         fi
     fi
 fi
