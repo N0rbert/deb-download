@@ -9,7 +9,7 @@ The main motivation to write this script was partial removal of Python 2 stuff f
 The `deb-download.sh` takes at least three pairs of arguments, as shown in example below:
 
 ```
-./deb-download.sh -d ubuntu -r bionic -u zenmap
+./deb-download.sh -d ubuntu -r bionic -p zenmap
 ```
 
 * `-d` (distribution, mandatory) - `debian` for Debian, `ubuntu` for Ubuntu or `mint` for LinuxMint;
