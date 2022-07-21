@@ -6,17 +6,18 @@ Under the hood this script uses Docker to obtain minimal file-system of needed s
 
 The main motivation to write this script was partial removal of Python 2 stuff from Ubuntu 20.04 LTS official repositories. For regular users this means that applications like ZeNMap, FSLint are no longer available from `apt`/`apt-get`. So users need to download them manually from <https://packages.ubuntu.com>. This script automates this process.
 
-The `deb-download.sh` takes at least three arguments, as shown in example below:
+The `deb-download.sh` takes at least three pairs of arguments, as shown in example below:
 
 ```
-./deb-download.sh ubuntu bionic zenmap
+./deb-download.sh -d ubuntu -r bionic -u zenmap
 ```
 
-* 1st is distribution - `debian` for Debian, `ubuntu` for Ubuntu or `mint` for LinuxMint;
-* 2nd is version - all versions starting from Debian 6 (`squeeze`), Ubuntu 12.04 LTS (`precise`) and LinuxMint (`17`) are supported by script;
-* 3rd and greater - represent package(s) name(s) - in the above example it is single `zenmap` package.
+* `-d` (distribution, mandatory) - `debian` for Debian, `ubuntu` for Ubuntu or `mint` for LinuxMint;
+* `-r` (release, mandatory) - all versions starting from Debian 6 (`squeeze`), Ubuntu 12.04 LTS (`precise`) and LinuxMint (`17`) are supported by script;
+* `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `zenmap` package. For two packages use `"mc htop"` (for example);
+* `-t` (third-party PPA or full deb-line for `add-apt-repository`, optional) - for example `ppa:user/repo` or `deb http://ppa.launchpad.net/user/repo/ubuntu bionic main` with the corresponding key for `apt-key` (`-k AABBCCDDEEFF0011` for this example).
 
-Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./deb-download.sh ubuntu bionic zenmap` .
+Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./deb-download.sh -d ubuntu -r bionic -p zenmap` .
 
 How to start using this script:
 
@@ -40,7 +41,7 @@ How to start using this script:
 
        cd deb-download
        chmod +x deb-download.sh
-       ./deb-download.sh ubuntu bionic fslint
+       ./deb-download.sh -d ubuntu -r bionic -p fslint
 
 1. Carefully inspect the contents of `storage` folder, then try to install main deb-package to the target system, then fix its dependencies one-by-one. For better understanding consult with <https://packages.ubuntu.com>.
 
