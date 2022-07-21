@@ -15,7 +15,8 @@ The `deb-download.sh` takes at least three pairs of arguments, as shown in examp
 * `-d` (distribution, mandatory) - `debian` for Debian, `ubuntu` for Ubuntu or `mint` for LinuxMint;
 * `-r` (release, mandatory) - all versions starting from Debian 6 (`squeeze`), Ubuntu 12.04 LTS (`precise`) and LinuxMint (`17`) are supported by script;
 * `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `zenmap` package. For two packages use `"mc htop"` (for example);
-* `-t` (third-party PPA or full deb-line for `add-apt-repository`, optional) - for example `ppa:user/repo` or `deb http://ppa.launchpad.net/user/repo/ubuntu bionic main` with the corresponding key for `apt-key` (`-k AABBCCDDEEFF0011` for this example).
+* `-t` (third-party PPA or full deb-line for `add-apt-repository`, optional) - for example `ppa:user/repo` or `deb http://ppa.launchpad.net/user/repo/ubuntu bionic main` with the corresponding key for `apt-key` (`-k AABBCCDDEEFF0011` for this example);
+* `-s` (get source code of Debian or Ubuntu package(s), optional).
 
 Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./deb-download.sh -d ubuntu -r bionic -p zenmap` .
 
