@@ -206,7 +206,7 @@ if [ $get_source == 1 ]; then
     if [ "$distro" != "mint" ] && [ -n "$third_party_repo" ]; then
         add_sources="-s";
     fi
-    get_source_command="apt-get install dpkg-dev --no-install-recommends -y && apt-get source ${packages[*]}"
+    get_source_command="apt-get install dpkg-dev --no-install-recommends -y && apt-get source ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]}"
 fi
 
 # third-party repository key and PPA/deb-line
@@ -228,7 +228,7 @@ apt-get update && \
 $apt_key_command && \
 $third_party_repo_command && \
 $get_source_command || true && \
-apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed "s|'||g" > /var/cache/apt/archives/urls.txt &&
+apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed "s|'||g" >> /var/cache/apt/archives/urls.txt &&
 apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]}
 chown -R "$(id --user):$(id --group)" /var/cache/apt/archives
 EOF
