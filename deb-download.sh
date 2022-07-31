@@ -36,8 +36,8 @@ third_party_repo_command="true"
 get_source_command="true"
 
 # distros and their versions
-supported_ubuntu_releases="trusty|xenial|bionic|focal|hirsute|impish|jammy|devel";
-eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy";
+supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|kinetic|devel";
+eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish";
 ubuntu_release_is_eol=0;
 
 supported_debian_releases="jessie|oldoldstable|stretch|oldstable|buster|stable|bullseye";
@@ -47,7 +47,7 @@ rolling_debian_releases="sid|unstable|experimental";
 eol_debian_releases="squeeze|wheezy";
 debian_release_is_eol=0;
 
-supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3";
+supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$";
 eol_mint_releases="17$|18$";
 
 no_install_suggests="--no-install-suggests";
@@ -214,7 +214,7 @@ if [ -n "$apt_key" ]; then
     apt_key_command="apt-get install -y gnupg && apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $apt_key"
 fi
 if [ -n "$third_party_repo" ]; then
-    third_party_repo_command="apt-get install software-properties-common gpg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
+    third_party_repo_command="apt-get install software-properties-common gnupg gpg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
 fi
 
 # prepare download script
