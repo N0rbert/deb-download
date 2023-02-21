@@ -3,12 +3,12 @@ usage="$(basename "$0") [-h] [-d DISTRO] [-r RELEASE] [-p \"PACKAGE1 PACKAGE2 ..
 Download deb-package(s) for given distribution release,
 where:
     -h  show this help text
-    -d  distro name (debian, ubuntu, mint, astra)
-    -r  release name (buster, focal, 20.3, 2.12)
+    -d  distro name (debian, ubuntu, mint, kali)
+    -r  release name (buster, focal, 20.3, rolling)
     -p  packages
     -k  key for apt-key command (optional)
-    -t  extra PPA repository for Ubuntu (optional)
-    -s  also download source-code for Debian or Ubuntu package(s) (optional)"
+    -t  extra PPA repository for Ubuntu or full deb-line (optional)
+    -s  also download source-code for deb-package(s) (optional)"
 
 get_source=0
 while getopts ":hd:r:p:k:t:s" opt; do
@@ -50,7 +50,7 @@ debian_release_is_eol=0;
 supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$";
 eol_mint_releases="17$|18$";
 
-supported_astra_releases="1.7|2.12"
+supported_kali_releases="rolling";
 
 no_install_suggests="--no-install-suggests";
 no_update="-n";
@@ -58,8 +58,8 @@ add_sources="";
 
 # main code
 
-if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] && [ "$distro" != "mint" ] && [ "$distro" != "astra" ]; then
-    echo "Error: only Debian, Ubuntu, Mint and Astra are supported!";
+if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] && [ "$distro" != "mint" ] && [ "$distro" != "kali" ]; then
+    echo "Error: only Debian, Ubuntu, Mint and Kali are supported!";
     exit 1;
 else
     if [ "$distro" == "ubuntu" ]; then
@@ -108,11 +108,11 @@ else
            fi
        fi
     fi
-
-    if [ "$distro" == "astra" ]; then
-       if ! echo "$release" | grep -wEq "$supported_astra_releases"
+    
+    if [ "$distro" == "kali" ]; then
+       if ! echo "$release" | grep -wEq "$supported_kali_releases"
        then
-            echo "Error: Astra $release is not supported!";
+            echo "Error: Kali $release is not supported!";
             exit 1;
        fi
     fi
@@ -126,15 +126,15 @@ cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 # prepare Dockerfile
 if [ "$distro" == "ubuntu" ] || [ "$distro" == "debian" ]; then
     echo "FROM $distro:$release" > Dockerfile
-elif [ "$distro" == "astra" ]; then
-    echo "FROM ftophuk/astralinux_ce" > Dockerfile
-else
+elif [ "$distro" == "mint" ]; then
     echo "FROM linuxmintd/mint$release-amd64" > Dockerfile
     no_update=""
 
     if [ $get_source == 1 ] && [ -n "$third_party_repo" ]; then
         echo "Warning: add-apt-repository on Mint does not support '-s' option, so getting sources is not possible, ignoring this option for third-party repositories."
     fi
+else
+    echo "FROM kalilinux/kali-$release" > Dockerfile
 fi
 
 cat << EOF >> Dockerfile
@@ -213,33 +213,9 @@ if [ "$distro" == "debian" ]; then
     fi
 fi
 
-if [ "$distro" == "astra" ]; then
-    if [ "$release" == "1.7" ]; then
-        echo "RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-main/     1.7_x86-64 main contrib non-free' > /etc/apt/sources.list
-RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-update/   1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
-RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-base/     1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
-RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
-RUN echo '# deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 astra-ce' >> /etc/apt/sources.list" >> Dockerfile
-
-        if [ $get_source == 1 ]; then
-            echo "Warning: sources for Astra Linux 1.7 are not available, but script will try to run further."
-        fi
-
-    elif [ "$release" == "2.12" ]; then
-        echo "RUN echo 'deb http://mirror.yandex.ru/astra/stable/2.12_x86-64/repository orel main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
-        no_update=""
-        
-        if [ $get_source == 1 ]; then
-            echo "RUN echo 'deb-src http://mirror.yandex.ru/astra/stable/2.12_x86-64/repository orel main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
-        fi        
-    fi
-fi
-
-# 32-bit packages
-if [[ "$distro" == "debian" || "$distro" == "ubuntu" || "$distro" == "mint" ]]; then
-    # add 32-bit
-    if [ "$(arch)" == "x86_64" ]; then
-        echo "RUN dpkg --add-architecture i386" >> Dockerfile
+if [ "$distro" == "kali" ]; then
+    if [ $get_source == 1 ]; then
+        echo "RUN echo 'deb-src http://http.kali.org/kali kali-$release main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
     fi
 fi
 
@@ -256,11 +232,7 @@ if [ -n "$apt_key" ]; then
     apt_key_command="apt-get install -y gnupg && apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $apt_key"
 fi
 if [ -n "$third_party_repo" ]; then
-    if [ "$distro" == "astra" ]; then
-        echo "Warning: add-apt-repository command is not yet supported on AstraLinux, but script will try to run further."
-    else
-        third_party_repo_command="apt-get install software-properties-common gnupg gpg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
-    fi
+    third_party_repo_command="apt-get install software-properties-common gnupg gpg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
 fi
 
 # prepare download script

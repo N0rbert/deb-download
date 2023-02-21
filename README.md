@@ -12,8 +12,8 @@ The `deb-download.sh` takes at least three pairs of arguments, as shown in examp
 ./deb-download.sh -d ubuntu -r bionic -p zenmap
 ```
 
-* `-d` (distribution, mandatory) - `debian` for Debian, `ubuntu` for Ubuntu, `mint` for LinuxMint or `astra` for AstraLinux;
-* `-r` (release, mandatory) - all versions starting from Debian 6 (`squeeze`), Ubuntu 12.04 LTS (`precise`), LinuxMint (`17`) and AstraLinux (`2.12` and `1.7`) are supported by script;
+* `-d` (distribution, mandatory) - `debian` for Debian, `ubuntu` for Ubuntu, `mint` for LinuxMint or `kali` for Kali Linux;
+* `-r` (release, mandatory) - all versions starting from Debian 6 (`squeeze`), Ubuntu 12.04 LTS (`precise`), LinuxMint (`17`) and Kali Linux (`rolling`) are supported by script;
 * `-p` (with quotes for multiple packages, mandatory) - represent package(s) name(s) - in the above example it is single `zenmap` package. For two packages use `"mc htop"` (for example);
 * `-t` (third-party PPA or full deb-line for `add-apt-repository`, optional) - for example `ppa:user/repo` or `deb http://ppa.launchpad.net/user/repo/ubuntu bionic main` with the corresponding key for `apt-key` (`-k AABBCCDDEEFF0011` for this example);
 * `-s` (get source code of Debian or Ubuntu package(s), optional).
