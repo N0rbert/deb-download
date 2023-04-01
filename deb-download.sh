@@ -40,11 +40,11 @@ supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|kinetic|devel";
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish";
 ubuntu_release_is_eol=0;
 
-supported_debian_releases="jessie|oldoldstable|stretch|oldstable|buster|stable|bullseye";
+supported_debian_releases="oldoldstable|stretch|oldstable|buster|stable|bullseye";
 debian_releases_newsecurity="stable|bullseye";
 testing_debian_releases="bookworm|testing";
 rolling_debian_releases="sid|unstable|experimental";
-eol_debian_releases="squeeze|wheezy";
+eol_debian_releases="squeeze|wheezy|jessie";
 debian_release_is_eol=0;
 
 supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1";
@@ -90,7 +90,7 @@ else
 
                 # workaround for Debain Squeeze - it does not have `--no-install-suggests` 
                 # and has problem with GPG signature
-                if [ "$release" == "squeeze" ]; then
+                if [[ "$release" == "squeeze" || "$release" == "jessie" ]]; then
                     no_install_suggests="--force-yes";
                 fi
            fi
