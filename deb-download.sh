@@ -36,7 +36,7 @@ third_party_repo_command="true"
 get_source_command="true"
 
 # distros and their versions
-supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|kinetic|devel";
+supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|kinetic|lunar|devel";
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish";
 ubuntu_release_is_eol=0;
 
