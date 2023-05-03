@@ -179,9 +179,11 @@ fi
 if [ "$distro" == "debian" ]; then
     if [ $debian_release_is_eol == 1 ]; then
         echo "RUN echo 'deb http://archive.debian.org/debian $release main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
+        echo "RUN echo 'deb http://archive.debian.org/debian-security $release/updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
 
         if [ $get_source == 1 ]; then
             echo "RUN echo 'deb-src http://archive.debian.org/debian $release main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+            echo "RUN echo 'deb-src http://archive.debian.org/debian-security $release/updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
         fi
     else # adding *contrib* and *non-free*
         echo "RUN echo 'deb http://deb.debian.org/debian/ $release main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
