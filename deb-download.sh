@@ -40,14 +40,14 @@ supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|kinetic|lunar|mantic
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish";
 ubuntu_release_is_eol=0;
 
-supported_debian_releases="oldstable|buster|stable|bullseye";
-debian_releases_newsecurity="stable|bullseye";
-testing_debian_releases="bookworm|testing";
+supported_debian_releases="oldoldstable|buster|oldstable|bullseye";
+debian_releases_newsecurity="stable|bookworm";
+testing_debian_releases="testing|trixie";
 rolling_debian_releases="sid|unstable|experimental";
 eol_debian_releases="squeeze|wheezy|jessie|stretch";
 debian_release_is_eol=0;
 
-supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1";
+supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2";
 eol_mint_releases="17$|18$";
 
 supported_astra_releases="1.7|2.12"
