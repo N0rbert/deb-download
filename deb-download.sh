@@ -8,10 +8,12 @@ where:
     -p  packages
     -k  key for apt-key command (optional)
     -t  extra PPA repository for Ubuntu or full deb-line (optional)
-    -s  also download source-code for deb-package(s) (optional)"
+    -s  also download source-code for deb-package(s) (optional)
+    -b  use deb-package(s) from backports pocket (optional)"
 
 get_source=0
-while getopts ":hd:r:p:k:t:s" opt; do
+use_backports=0
+while getopts ":hd:r:p:k:t:sb" opt; do
   case "$opt" in
     h) echo "$usage"; exit;;
     d) distro=$OPTARG;;
@@ -20,6 +22,7 @@ while getopts ":hd:r:p:k:t:s" opt; do
     k) apt_key=$OPTARG;;
     t) third_party_repo=$OPTARG;;
     s) get_source=1;;
+    b) use_backports=1;;
     \?) echo "Error: Unimplemented option chosen!"; echo "$usage" >&2; exit 1;;
   esac
 done
@@ -34,14 +37,15 @@ fi
 apt_key_command="true"
 third_party_repo_command="true"
 get_source_command="true"
+use_backports_command=""
 
 # distros and their versions
 supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|kinetic|lunar|mantic|devel";
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish";
 ubuntu_release_is_eol=0;
 
-supported_debian_releases="oldoldstable|buster|oldstable|bullseye";
-debian_releases_newsecurity="stable|bookworm";
+supported_debian_releases="oldoldstable|buster|oldstable|bullseye|stable|bookworm";
+debian_releases_newsecurity="oldstable|bullseye|stable|bookworm";
 testing_debian_releases="testing|trixie";
 rolling_debian_releases="sid|unstable|experimental";
 eol_debian_releases="squeeze|wheezy|jessie|stretch";
@@ -148,6 +152,12 @@ else
     echo "FROM kalilinux/kali-$release" > Dockerfile
 fi
 
+if [ $use_backports == 1 ]; then
+    if [[ "$distro" == "astra" || "$distro" == "mint" || "$distro" == "kali" ]]; then
+        echo "Warning: backports are not yet supported for Astra, Kali and Mint."
+    fi
+fi
+
 cat << EOF >> Dockerfile
 RUN [ -z "$http_proxy" ] && echo "Using direct network connection" || echo 'Acquire::http::Proxy "$http_proxy";' > /etc/apt/apt.conf.d/99proxy
 EOF
@@ -158,20 +168,37 @@ if [ "$distro" == "ubuntu" ]; then
 RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-updates main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
 
+        if [ $use_backports == 1 ]; then
+            echo "RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-backports main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+            use_backports_command="-t $release-backports"
+        fi
+
         if [ $get_source == 1 ]; then
             echo "RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release-updates main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+            if [ $use_backports == 1 ]; then
+                echo "RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release-backports main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+            fi
         fi
     else # fixes missed *multiverse* for at least *precise*
         echo "RUN echo 'deb http://archive.ubuntu.com/ubuntu $release main universe multiverse restricted' > /etc/apt/sources.list
 RUN echo 'deb http://archive.ubuntu.com/ubuntu $release-updates main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb http://archive.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
 
+        if [ $use_backports == 1 ]; then
+            echo "RUN echo 'deb http://archive.ubuntu.com/ubuntu $release-backports main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+            use_backports_command="-t $release-backports"
+        fi
+
         if [ $get_source == 1 ]; then
             echo "RUN echo 'deb-src http://archive.ubuntu.com/ubuntu $release main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb-src http://archive.ubuntu.com/ubuntu $release-updates main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb-src http://archive.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+
+            if [ $use_backports == 1 ]; then
+                echo "RUN echo 'deb-src http://archive.ubuntu.com/ubuntu $release-backports main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+            fi
         fi
     fi
 fi
@@ -188,8 +215,17 @@ if [ "$distro" == "debian" ]; then
     else # adding *contrib* and *non-free*
         echo "RUN echo 'deb http://deb.debian.org/debian/ $release main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
 
+        if [ $use_backports == 1 ]; then
+            echo "RUN echo 'deb http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+            use_backports_command="-t $release-backports"
+        fi
+
         if [ $get_source == 1 ]; then
             echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+            
+            if [ $use_backports == 1 ]; then
+                echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+            fi
         fi
 
         # not adding updates
@@ -267,7 +303,7 @@ if [ $get_source == 1 ]; then
     if [ "$distro" != "mint" ] && [ -n "$third_party_repo" ]; then
         add_sources="-s";
     fi
-    get_source_command="apt-get install dpkg-dev --no-install-recommends -y && apt-get source ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]}"
+    get_source_command="apt-get install dpkg-dev --no-install-recommends -y && apt-get source ${packages[*]} $use_backports_command --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]} $use_backports_command"
 fi
 
 # third-party repository key and PPA/deb-line
@@ -293,8 +329,8 @@ apt-get update && \
 $apt_key_command && \
 $third_party_repo_command && \
 $get_source_command || true && \
-apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]} --print-uris | grep ^\'http:// | awk '{print \$1}' | sed "s|'||g" >> /var/cache/apt/archives/urls.txt &&
-apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]}
+apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]} $use_backports_command --print-uris | grep ^\'http:// | awk '{print \$1}' | sed "s|'||g" >> /var/cache/apt/archives/urls.txt &&
+apt-get install -y --no-install-recommends $no_install_suggests --reinstall --download-only ${packages[*]} $use_backports_command
 chown -R "$(id --user):$(id --group)" /var/cache/apt/archives
 EOF
 
