@@ -48,6 +48,7 @@ supported_debian_releases="oldoldstable|buster|oldstable|bullseye|stable|bookwor
 debian_releases_newsecurity="oldstable|bullseye|stable|bookworm";
 testing_debian_releases="testing|trixie";
 rolling_debian_releases="sid|unstable|experimental";
+non_free_firmware_debian_releases="stable|bookworm|$testing_debian_releases|$rolling_debian_releases"
 eol_debian_releases="squeeze|wheezy|jessie|stretch";
 debian_release_is_eol=0;
 
@@ -215,16 +216,40 @@ if [ "$distro" == "debian" ]; then
     else # adding *contrib* and *non-free*
         echo "RUN echo 'deb http://deb.debian.org/debian/ $release main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
 
+        # adding *non-free-firmware* for *bookworm* and newer
+        if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
+        then
+            echo "RUN echo 'deb http://deb.debian.org/debian/ $release non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+        fi
+
         if [ $use_backports == 1 ]; then
             echo "RUN echo 'deb http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+
+            # adding *non-free-firmware* for *bookworm* and newer
+            if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
+            then
+                echo "RUN echo 'deb http://deb.debian.org/debian/ $release-backports non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+            fi
             use_backports_command="-t $release-backports"
         fi
 
         if [ $get_source == 1 ]; then
             echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+
+            # adding *non-free-firmware* for *bookworm* and newer
+            if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
+            then
+                echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+            fi
             
             if [ $use_backports == 1 ]; then
                 echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+
+                # adding *non-free-firmware* for *bookworm* and newer
+                if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
+                then
+                    echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-backports non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+                fi
             fi
         fi
 
@@ -233,8 +258,20 @@ if [ "$distro" == "debian" ]; then
         then
             echo "RUN echo 'deb http://deb.debian.org/debian/ $release-updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
 
+            # adding *non-free-firmware* for *bookworm* and newer
+            if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
+            then
+                echo "RUN echo 'deb http://deb.debian.org/debian/ $release-updates non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+            fi
+
             if [ $get_source == 1 ]; then
                 echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+
+                # adding *non-free-firmware* for *bookworm* and newer
+                if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
+                then
+                    echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-updates non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+                fi
             fi
         fi
 
