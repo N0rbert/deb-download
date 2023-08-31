@@ -69,9 +69,11 @@ if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] && [ "$distro" != "min
     exit 1;
 else
     if [ "$distro" == "ubuntu" ]; then
-       if ! echo "$release" | grep -wEq "$supported_ubuntu_releases|$eol_ubuntu_releases"
+       ubuntu_releases="$supported_ubuntu_releases|$eol_ubuntu_releases"
+       if ! echo "$release" | grep -wEq "$ubuntu_releases"
        then
             echo "Error: Ubuntu $release is not supported!";
+            echo "Supported Ubuntu releases are ${ubuntu_releases//|/, }.";
             exit 1;
        else
            if echo "$release" | grep -wEq "$eol_ubuntu_releases"
@@ -83,9 +85,11 @@ else
     fi
 
     if [ "$distro" == "debian" ]; then
-       if ! echo "$release" | grep -wEq "$supported_debian_releases|$eol_debian_releases|$testing_debian_releases|$rolling_debian_releases"
+       debian_releases="$supported_debian_releases|$eol_debian_releases|$testing_debian_releases|$rolling_debian_releases"
+       if ! echo "$release" | grep -wEq "$debian_releases"
        then
             echo "Error: Debian $release is not supported!";
+            echo "Supported Debian releases are ${debian_releases//|/, }.";
             exit 1;
        else
            if echo "$release" | grep -wEq "$eol_debian_releases"
@@ -103,9 +107,12 @@ else
     fi
 
     if [ "$distro" == "mint" ]; then
-       if ! echo "$release" | grep -wEq "$supported_mint_releases|$eol_mint_releases"
+       mint_releases="$supported_mint_releases|$eol_mint_releases"
+       if ! echo "$release" | grep -wEq "$mint_releases"
        then
             echo "Error: Mint $release is not supported!";
+            mint_temp="${mint_releases//|/, }"
+            echo "Supported Mint releases are ${mint_temp//$/}".;
             exit 1;
        else
            if echo "$release" | grep -wEq "$eol_mint_releases"
@@ -119,6 +126,7 @@ else
        if ! echo "$release" | grep -wEq "$supported_astra_releases"
        then
             echo "Error: Astra $release is not supported!";
+            echo "Supported Astra releases are ${supported_astra_releases//|/, }".;
             exit 1;
        fi
     fi
@@ -127,6 +135,7 @@ else
        if ! echo "$release" | grep -wEq "$supported_kali_releases"
        then
             echo "Error: Kali $release is not supported!";
+            echo "Supported Kali releases are ${supported_kali_releases//|/, }".;
             exit 1;
        fi
     fi
@@ -170,8 +179,10 @@ RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-updates main univer
 RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
 
         if [ $use_backports == 1 ]; then
+          if [ "$release" != "precise" ]; then
             echo "RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-backports main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
             use_backports_command="-t $release-backports"
+          fi
         fi
 
         if [ $get_source == 1 ]; then
@@ -179,7 +190,9 @@ RUN echo 'deb http://old-releases.ubuntu.com/ubuntu $release-security main unive
 RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release-updates main universe multiverse restricted' >> /etc/apt/sources.list
 RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release-security main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
             if [ $use_backports == 1 ]; then
+              if [ "$release" != "precise" ]; then
                 echo "RUN echo 'deb-src http://old-releases.ubuntu.com/ubuntu $release-backports main universe multiverse restricted' >> /etc/apt/sources.list" >> Dockerfile
+              fi
             fi
         fi
     else # fixes missed *multiverse* for at least *precise*
@@ -212,6 +225,17 @@ if [ "$distro" == "debian" ]; then
         if [ $get_source == 1 ]; then
             echo "RUN echo 'deb-src http://archive.debian.org/debian $release main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
             echo "RUN echo 'deb-src http://archive.debian.org/debian-security $release/updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+        fi
+        
+        if [ "$release" != "wheezy" ]; then
+          if [ $use_backports == 1 ]; then
+            echo "RUN echo 'deb http://archive.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+            if [ $get_source == 1 ]; then
+              echo "RUN echo 'deb-src http://archive.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+            fi
+
+            use_backports_command="--force-yes --allow-unauthenticated -t $release-backports"
+          fi
         fi
     else # adding *contrib* and *non-free*
         echo "RUN echo 'deb http://deb.debian.org/debian/ $release main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
@@ -340,7 +364,7 @@ if [ $get_source == 1 ]; then
     if [ "$distro" != "mint" ] && [ -n "$third_party_repo" ]; then
         add_sources="-s";
     fi
-    get_source_command="apt-get install dpkg-dev --no-install-recommends -y && apt-get source ${packages[*]} $use_backports_command --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]} $use_backports_command"
+    get_source_command="apt-get install dpkg-dev --no-install-recommends -y $use_backports_command && apt-get source ${packages[*]} $use_backports_command --print-uris | grep ^\'http:// | awk '{print \$1}' | sed \"s|'||g\" >> /var/cache/apt/archives/urls.txt && apt-get source ${packages[*]} $use_backports_command"
 fi
 
 # third-party repository key and PPA/deb-line
