@@ -52,8 +52,8 @@ non_free_firmware_debian_releases="stable|bookworm|$testing_debian_releases|$rol
 eol_debian_releases="squeeze|wheezy|jessie|stretch";
 debian_release_is_eol=0;
 
-supported_mint_releases="19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3";
-eol_mint_releases="17$|18$";
+supported_mint_releases="lmde5|lmde6|19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3";
+eol_mint_releases="lmde4|17$|18$"; # lmde2 and lmde3 are broken because of archival
 
 supported_astra_releases="1.7|2.12";
 supported_kali_releases="rolling";
@@ -152,7 +152,12 @@ if [ "$distro" == "ubuntu" ] || [ "$distro" == "debian" ]; then
 elif [ "$distro" == "astra" ]; then
     echo "FROM ftophuk/astralinux_ce" > Dockerfile
 elif [ "$distro" == "mint" ]; then
-    echo "FROM linuxmintd/mint$release-amd64" > Dockerfile
+    if ! echo "$release" | grep -q "^lmde"
+    then
+      echo "FROM linuxmintd/mint$release-amd64" > Dockerfile
+    else
+      echo "FROM linuxmintd/$release-amd64" > Dockerfile
+    fi
     no_update=""
 
     if [ $get_source == 1 ] && [ -n "$third_party_repo" ]; then
