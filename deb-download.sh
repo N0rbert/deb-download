@@ -61,6 +61,7 @@ supported_kali_releases="rolling";
 no_install_suggests="--no-install-suggests";
 no_update="-n";
 add_sources="";
+gpg_pkg="gpg";
 
 # main code
 
@@ -380,7 +381,11 @@ if [ -n "$third_party_repo" ]; then
     if [ "$distro" == "astra" ]; then
         echo "Warning: add-apt-repository command is not yet supported on AstraLinux, but script will try to run further."
     else
-        third_party_repo_command="apt-get install software-properties-common gnupg gpg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
+        if [ "$release" == "xenial" ]; then
+            gpg_pkg=""
+            no_update=""
+        fi
+        third_party_repo_command="apt-get install software-properties-common gnupg $gpg_pkg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
     fi
 fi
 
