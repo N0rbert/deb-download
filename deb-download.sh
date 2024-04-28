@@ -40,7 +40,7 @@ get_source_command="true"
 use_backports_command=""
 
 # distros and their versions
-supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|lunar|mantic|devel";
+supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|lunar|mantic|noble|devel";
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish|kinetic";
 ubuntu_release_is_eol=0;
 
