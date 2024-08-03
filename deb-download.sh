@@ -151,7 +151,13 @@ cd storage || { echo "Error: can't cd to storage directory!"; exit 3; }
 if [ "$distro" == "ubuntu" ] || [ "$distro" == "debian" ]; then
     echo "FROM $distro:$release" > Dockerfile
 elif [ "$distro" == "astra" ]; then
-    echo "FROM ftophuk/astralinux_ce" > Dockerfile
+    if [ "$release" == "2.12" ]; then
+      echo "FROM registry.astralinux.ru/library/orel:latest" > Dockerfile
+    elif [ "$release" == "1.7" ]; then
+      echo "FROM registry.astralinux.ru/library/astra/ubi17:latest" > Dockerfile
+    elif [ "$release" == "1.8" ]; then
+      "FROM registry.astralinux.ru/library/astra/ubi18:latest" > Dockerfile
+    fi
 elif [ "$distro" == "mint" ]; then
     if ! echo "$release" | grep -q "^lmde"
     then
@@ -336,40 +342,16 @@ RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-update/
 RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-base/     1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
 RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
 RUN echo '# deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 astra-ce' >> /etc/apt/sources.list" >> Dockerfile
-
-        if [ $get_source == 1 ]; then
-            echo "Warning: sources for Astra Linux 1.7 are not available, but script will try to run further."
-        fi
     elif [ "$release" == "1.8" ]; then
-        # install all updates for 2.12 first
-        echo "RUN echo 'deb http://mirror.yandex.ru/astra/stable/2.12_x86-64/repository orel main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
-        echo "RUN apt-get update && apt-get upgrade -y && apt-get install -f -y && apt-get dist-upgrade -y" >> Dockerfile
-
-        # upgrade to 1.7
-        echo "RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-main/     1.7_x86-64 main contrib non-free' > /etc/apt/sources.list
-RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-update/   1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
-RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-base/     1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
-RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 main contrib non-free' >> /etc/apt/sources.list
-RUN echo '# deb http://dl.astralinux.ru/astra/stable/1.7_x86-64/repository-extended/ 1.7_x86-64 astra-ce' >> /etc/apt/sources.list" >> Dockerfile
-        echo "RUN apt-get update && apt-get upgrade -y && apt-get install -f -y && apt-get dist-upgrade -y && apt autopurge -y" >> Dockerfile
-
-        # upgrade to 1.8 without usrmerge
-        echo "RUN echo 'Package: usr-is-merged\nPin: version *\nPin-Priority: -10\n\nPackage: usrmerge\nPin: version *\nPin-Priority: -10' > /etc/apt/preferences.d/pin-usrmerge" >> Dockerfile
         echo "RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.8_x86-64/repository-main/     1.8_x86-64 main contrib non-free non-free-firmware' > /etc/apt/sources.list
 RUN echo 'deb http://dl.astralinux.ru/astra/stable/1.8_x86-64/repository-extended/ 1.8_x86-64 main contrib non-free non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
-        # FIXME - temporary fix for libcrypt1 problem, upgrade the packages to have consistent system
-        echo "RUN apt-get update && apt-get install -y perl-base libcrypt1; dpkg -x /var/cache/apt/archives/libcrypt1_*_amd64.deb /; apt-get install -f -y && apt-get dist-upgrade -y && apt autopurge -y && apt-get install --reinstall -y libcrypt1" >> Dockerfile
-
-        if [ $get_source == 1 ]; then
-            echo "Warning: sources for Astra Linux 1.8 are not available, but script will try to run further."
-        fi
     elif [ "$release" == "2.12" ]; then
-        echo "RUN echo 'deb http://mirror.yandex.ru/astra/stable/2.12_x86-64/repository orel main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
+        echo "RUN echo 'deb http://dl.astralinux.ru/astra/stable/2.12_x86-64/repository orel main contrib non-free' > /etc/apt/sources.list" >> Dockerfile
         no_update=""
-        
-        if [ $get_source == 1 ]; then
-            echo "RUN echo 'deb-src http://mirror.yandex.ru/astra/stable/2.12_x86-64/repository orel main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
-        fi        
+    fi
+
+    if [ $get_source == 1 ]; then
+        echo "Warning: sources for Astra Linux are not available, but script will try to run further."
     fi
 fi
 
