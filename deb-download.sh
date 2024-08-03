@@ -62,6 +62,7 @@ no_install_suggests="--no-install-suggests";
 no_update="-n";
 add_sources="";
 gpg_pkg="gpg";
+software_properties_pkg="software-properties-common"
 
 # main code
 
@@ -156,7 +157,7 @@ elif [ "$distro" == "astra" ]; then
     elif [ "$release" == "1.7" ]; then
       echo "FROM registry.astralinux.ru/library/astra/ubi17:latest" > Dockerfile
     elif [ "$release" == "1.8" ]; then
-      "FROM registry.astralinux.ru/library/astra/ubi18:latest" > Dockerfile
+      echo "FROM registry.astralinux.ru/library/astra/ubi18:1.8" > Dockerfile
     fi
 elif [ "$distro" == "mint" ]; then
     if ! echo "$release" | grep -q "^lmde"
@@ -385,11 +386,19 @@ if [ -n "$third_party_repo" ]; then
     if [ "$distro" == "astra" ]; then
         echo "Warning: add-apt-repository command is not yet supported on AstraLinux, but script will try to run further."
     else
-        if [ "$release" == "xenial" ]; then
+        if [ "$release" == "precise" ]; then
+            software_properties_pkg="python-software-properties"
+            gpg_pkg=""
+            no_update=""
+            if [ $get_source == 1 ]; then
+                add_sources="" # not needed on precise, deb-src is already enabled automatically
+            fi
+        elif [[ "$release" == "trusty" || "$release" == "xenial" ]]; then
             gpg_pkg=""
             no_update=""
         fi
-        third_party_repo_command="apt-get install software-properties-common gnupg $gpg_pkg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
+
+        third_party_repo_command="apt-get install -y python3-launchpadlib || apt-get install -y python-launchpadlib || true; apt-get install $software_properties_pkg gnupg $gpg_pkg dirmngr --no-install-recommends -y && add-apt-repository -y $add_sources $no_update \"$third_party_repo\" && apt-get update";
     fi
 fi
 
