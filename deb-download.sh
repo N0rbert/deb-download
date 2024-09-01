@@ -363,10 +363,12 @@ if [ "$distro" == "kali" ]; then
 fi
 
 # 32-bit packages
-if [[ "$distro" == "debian" || "$distro" == "ubuntu" || "$distro" == "mint" ]]; then
+if [[ "$distro" == "debian" || "$distro" == "ubuntu" || "$distro" == "mint" || "$distro" == "astra" ]]; then
     # add 32-bit
     if [ "$(arch)" == "x86_64" ]; then
+      if [[ "$release" != "squeeze" && "$release" != "precise" ]]; then
         echo "RUN dpkg --add-architecture i386" >> Dockerfile
+      fi
     fi
 fi
 
