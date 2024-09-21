@@ -260,7 +260,11 @@ if [ "$distro" == "debian" ]; then
         fi
 
         if [ $use_backports == 1 ]; then
+          if [ "$release" == "buster" ]; then
+            echo "RUN echo 'deb http://archive.debian.org/debian buster-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+          else
             echo "RUN echo 'deb http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+          fi
 
             # adding *non-free-firmware* for *bookworm* and newer
             if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
@@ -280,7 +284,11 @@ if [ "$distro" == "debian" ]; then
             fi
             
             if [ $use_backports == 1 ]; then
+              if [ "$release" == "buster" ]; then
+                echo "RUN echo 'deb-src http://archive.debian.org/debian buster-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+              else
                 echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+              fi
 
                 # adding *non-free-firmware* for *bookworm* and newer
                 if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
