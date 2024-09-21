@@ -307,6 +307,7 @@ if [ "$distro" == "debian" ]; then
             if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
             then
                 echo "RUN echo 'deb http://deb.debian.org/debian/ $release-updates non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+                echo "RUN echo 'deb http://security.debian.org/debian-security/ $release-security non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
             fi
 
             if [ $get_source == 1 ]; then
@@ -316,6 +317,7 @@ if [ "$distro" == "debian" ]; then
                 if echo "$release" | grep -wEq "$non_free_firmware_debian_releases"
                 then
                     echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-updates non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
+                    echo "RUN echo 'deb-src http://security.debian.org/debian-security/ $release-security non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
                 fi
             fi
         fi
