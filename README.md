@@ -21,31 +21,24 @@ The `deb-download.sh` takes at least three pairs of arguments, as shown in examp
 
 Note: if you have configured proxy in your network, then you can supply its address as the argument to the application - `http_proxy=http://192.168.12.34:8000 ./deb-download.sh -d ubuntu -r bionic -p zenmap` .
 
-How to start using this script:
+## How to start using this script:
 
-1. Install Docker and dependencies to the host system
-   
-       sudo apt-get update
-       sudo apt-get install docker.io git
+1. Dependencies:
+   - [Docker](https://docs.docker.com/engine/install/)
+   - [Curl](https://curl.se/download.html)
 
-1. Add current user to the `docker` group
-   
-       sudo usermod -a -G docker $USER
-   
-   then reboot machine.
+2. Use it:
 
-1. Clone this repository
 
-       cd ~/Downloads
-       git clone https://github.com/N0rbert/deb-download.git
+       curl -sL https://raw.githubusercontent.com/N0rbert/deb-download/refs/heads/master/deb-download.sh \
+       | bash -s -- *args 
+    e.g.
 
-1. Fetch some random deb-package
+       curl -sL https://raw.githubusercontent.com/N0rbert/deb-download/refs/heads/master/deb-download.sh \
+       | bash -s --  -d ubuntu -r bionic -p fslint
 
-       cd deb-download
-       chmod +x deb-download.sh
-       ./deb-download.sh -d ubuntu -r bionic -p fslint
 
-1. Carefully inspect the contents of `storage` folder, then try to install main deb-package to the target system, then fix its dependencies one-by-one. For better understanding consult with <https://packages.ubuntu.com>.
+3. Carefully inspect the contents of `storage` folder, then try to install main deb-package to the target system, then fix its dependencies one-by-one. For better understanding consult with <https://packages.ubuntu.com>.
 
    Please also note that this `storage` folder will be cleared on next run of the script!
 
