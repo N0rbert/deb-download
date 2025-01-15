@@ -40,8 +40,8 @@ get_source_command="true"
 use_backports_command=""
 
 # distros and their versions
-supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|lunar|mantic|noble|oracular|devel";
-eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish|kinetic";
+supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|noble|oracular|devel";
+eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish|kinetic|lunar|mantic";
 ubuntu_release_is_eol=0;
 
 supported_debian_releases="oldoldstable|buster|oldstable|bullseye|stable|bookworm";
@@ -52,7 +52,7 @@ non_free_firmware_debian_releases="stable|bookworm|$testing_debian_releases|$rol
 eol_debian_releases="squeeze|wheezy|jessie|stretch";
 debian_release_is_eol=0;
 
-supported_mint_releases="lmde5|lmde6|19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3|22$";
+supported_mint_releases="lmde5|lmde6|19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3|22$|22.1";
 eol_mint_releases="lmde4|17$|18$"; # lmde2 and lmde3 are broken because of archival
 
 supported_astra_releases="2.12|1.7|1.8";
