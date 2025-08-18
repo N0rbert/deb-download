@@ -44,12 +44,12 @@ supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|noble|oracular|pluck
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish|kinetic|lunar|mantic";
 ubuntu_release_is_eol=0;
 
-supported_debian_releases="oldoldstable|buster|oldstable|bullseye|stable|bookworm";
-debian_releases_newsecurity="oldstable|bullseye|stable|bookworm";
-testing_debian_releases="testing|trixie";
+supported_debian_releases="oldoldstable|bullseye|oldstable|bookworm|stable|trixie";
+debian_releases_newsecurity="oldoldstable|bullseye|stable|bookworm";
+testing_debian_releases="testing|forky";
 rolling_debian_releases="sid|unstable|experimental";
-non_free_firmware_debian_releases="stable|bookworm|$testing_debian_releases|$rolling_debian_releases"
-eol_debian_releases="squeeze|wheezy|jessie|stretch";
+non_free_firmware_debian_releases="oldstable|bookworm|stable|trixie|$testing_debian_releases|$rolling_debian_releases"
+eol_debian_releases="squeeze|wheezy|jessie|stretch|buster";
 debian_release_is_eol=0;
 
 supported_mint_releases="lmde5|lmde6|19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3|22$|22.1";
@@ -260,8 +260,8 @@ if [ "$distro" == "debian" ]; then
         fi
 
         if [ $use_backports == 1 ]; then
-          if [ "$release" == "buster" ]; then
-            echo "RUN echo 'deb http://archive.debian.org/debian buster-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+          if [[ "$release" == "buster" || "$release" == "bullseye" ]]; then
+            echo "RUN echo 'deb http://archive.debian.org/debian $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
           else
             echo "RUN echo 'deb http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
           fi
@@ -284,8 +284,8 @@ if [ "$distro" == "debian" ]; then
             fi
             
             if [ $use_backports == 1 ]; then
-              if [ "$release" == "buster" ]; then
-                echo "RUN echo 'deb-src http://archive.debian.org/debian buster-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
+              if [[ "$release" == "buster" || "$release" == "bullseye" ]]; then
+                echo "RUN echo 'deb-src http://archive.debian.org/debian $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
               else
                 echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
               fi
@@ -344,6 +344,22 @@ if [ "$distro" == "debian" ]; then
 
         no_update=""
     fi
+fi
+
+if [ "$distro" == "mint" ]; then
+  if [ "$release" == "lmde4" ]; then
+    echo "RUN sed -i '/deb.*debian.org.*/d' /etc/apt/sources.list.d/*.list
+
+RUN echo 'deb http://archive.debian.org/debian buster main contrib non-free' >> /etc/apt/sources.list.d/debian.list
+RUN echo 'deb http://archive.debian.org/debian-security buster/updates main contrib non-free' >> /etc/apt/sources.list.d/debian.list
+RUN echo 'deb http://archive.debian.org/debian/ buster-backports main contrib non-free' >> /etc/apt/sources.list.d/debian.list" >> Dockerfile
+
+     if [ $get_source == 1 ]; then
+       echo "RUN echo 'deb-src http://archive.debian.org/debian buster main contrib non-free' >> /etc/apt/sources.list.d/debian.list
+RUN echo 'deb-src http://archive.debian.org/debian-security buster/updates main contrib non-free' >> /etc/apt/sources.list.d/debian.list
+RUN echo 'deb-src http://archive.debian.org/debian/ buster-backports main contrib non-free' >> /etc/apt/sources.list.d/debian.list" >> Dockerfile
+     fi
+  fi
 fi
 
 if [ "$distro" == "astra" ]; then
