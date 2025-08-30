@@ -359,6 +359,8 @@ RUN echo 'deb http://archive.debian.org/debian/ buster-backports main contrib no
 RUN echo 'deb-src http://archive.debian.org/debian-security buster/updates main contrib non-free' >> /etc/apt/sources.list.d/debian.list
 RUN echo 'deb-src http://archive.debian.org/debian/ buster-backports main contrib non-free' >> /etc/apt/sources.list.d/debian.list" >> Dockerfile
      fi
+  elif [ "$release" == "lmde5" ]; then
+    echo "RUN sed -i 's|deb.debian.org/debian bullseye-backports|archive.debian.org/debian bullseye-backports|g' /etc/apt/sources.list.d/*.list" >> Dockerfile
   fi
 fi
 
