@@ -52,7 +52,7 @@ non_free_firmware_debian_releases="oldstable|bookworm|stable|trixie|$testing_deb
 eol_debian_releases="squeeze|wheezy|jessie|stretch|buster";
 debian_release_is_eol=0;
 
-supported_mint_releases="lmde5|lmde6|19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3|22$|22.1|22.2";
+supported_mint_releases="lmde5|lmde6|lmde7|19$|19.1|19.2|19.3|20$|20.1|20.2|20.3|21$|21.1|21.2|21.3|22$|22.1|22.2";
 eol_mint_releases="lmde4|17$|18$"; # lmde2 and lmde3 are broken because of archival
 
 supported_astra_releases="2.12|1.7|1.8";
