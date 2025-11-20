@@ -45,7 +45,7 @@ eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zest
 ubuntu_release_is_eol=0;
 
 supported_debian_releases="oldoldstable|bullseye|oldstable|bookworm|stable|trixie";
-debian_releases_newsecurity="oldoldstable|bullseye|stable|bookworm";
+debian_releases_newsecurity="oldoldstable|bullseye|stable|bookworm|trixie";
 testing_debian_releases="testing|forky";
 rolling_debian_releases="sid|unstable|experimental";
 non_free_firmware_debian_releases="oldstable|bookworm|stable|trixie|$testing_debian_releases|$rolling_debian_releases"
