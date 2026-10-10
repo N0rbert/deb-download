@@ -344,6 +344,12 @@ if [ "$distro" == "debian" ]; then
 
         no_update=""
     fi
+
+    # fix bullseye-security pocket issue - see https://www.reddit.com/r/debian/comments/1waumdn/comment/p8rx2ru/
+    if [ "$release" == "bullseye" ]; then
+        sed -i "s|deb http://security.debian.org/debian-security/ bullseye-security|deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260831T235959Z/ bullseye-security|g" Dockerfile
+        sed -i "s|deb-src http://security.debian.org/debian-security/ bullseye-security|deb-src [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260831T235959Z/ bullseye-security|g" Dockerfile
+    fi
 fi
 
 if [ "$distro" == "mint" ]; then
