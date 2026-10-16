@@ -40,7 +40,7 @@ get_source_command="true"
 use_backports_command=""
 
 # distros and their versions
-supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|noble|plucky|questing|resolute|devel";
+supported_ubuntu_releases="trusty|xenial|bionic|focal|jammy|noble|plucky|questing|resolute|stonking|devel";
 eol_ubuntu_releases="precise|quantal|raring|saucy|utopic|vivid|wily|yakkety|zesty|artful|cosmic|disco|eoan|groovy|hirsute|impish|kinetic|lunar|mantic|oracular";
 ubuntu_release_is_eol=0;
 
@@ -99,7 +99,7 @@ else
                 echo "Warning: Debian $release is EOL, but script will continue run.";
                 debian_release_is_eol=1;
 
-                # workaround for Debain Squeeze - it does not have `--no-install-suggests` 
+                # workaround for Debian Squeeze - it does not have `--no-install-suggests`
                 # and has problem with GPG signature
                 if [[ "$release" == "squeeze" || "$release" == "jessie" ]]; then
                     no_install_suggests="--force-yes";
@@ -239,7 +239,7 @@ if [ "$distro" == "debian" ]; then
             echo "RUN echo 'deb-src http://archive.debian.org/debian $release main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
             echo "RUN echo 'deb-src http://archive.debian.org/debian-security $release/updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
         fi
-        
+
         if [ "$release" != "wheezy" ]; then
           if [ $use_backports == 1 ]; then
             echo "RUN echo 'deb http://archive.debian.org/debian/ $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
@@ -282,7 +282,7 @@ if [ "$distro" == "debian" ]; then
             then
                 echo "RUN echo 'deb-src http://deb.debian.org/debian/ $release non-free-firmware' >> /etc/apt/sources.list" >> Dockerfile
             fi
-            
+
             if [ $use_backports == 1 ]; then
               if [[ "$release" == "buster" || "$release" == "bullseye" ]]; then
                 echo "RUN echo 'deb-src http://archive.debian.org/debian $release-backports main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
@@ -331,7 +331,7 @@ if [ "$distro" == "debian" ]; then
                 echo "RUN echo 'deb-src http://security.debian.org/debian-security/ $release/updates main contrib non-free' >> /etc/apt/sources.list" >> Dockerfile
             fi
         fi
-        
+
         # adding security in new fashion
         if echo "$release" | grep -wEq "$debian_releases_newsecurity"
         then
